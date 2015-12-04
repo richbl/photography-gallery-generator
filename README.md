@@ -1,10 +1,11 @@
-Photography Gallery Generator
-===================
+##Photography Gallery Generator
 
-
-This is a simple bash script that parses a folder of images (default: jpg), processes them (reduce, resize, and applies a watermark) using ImageMagick, and generates an HTML index for use in a photography website.
+This is a simple bash script that parses a folder of images (default: jpg), processes them (reduces, resizes, and applies a watermark) using ImageMagick, and generates an HTML index for use in a photography website.
 
 See below for an example of both a processed image file and the resulting HTML index:
+
+![Google Maps Population Density Plots](https://cloud.githubusercontent.com/assets/10182110/11600178/e89555b2-9a7f-11e5-8d9a-888f57f62035.jpg "Google Maps Population Density Plots")
+
 
 ```
 <!-- BEGIN Macro World gallery images -->

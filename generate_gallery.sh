@@ -19,13 +19,13 @@ PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 # A bash script to prep (rename, resize, reduce, and watermark) a folder of
 # images, and then generate an index in HTML
 #
-# Version: 0.1.0
+# Version: 0.2.0
 #
 # Requirements:
 #
 #  --A folder full of image files
 #  --File for watermark (dbi_watermark.png)
-#  --Imagemagick (convert program) for file manipulation
+#  --Imagemagick (convert program) for file conversion (size reduction)
 #
 # Inputs:
 #
@@ -121,19 +121,32 @@ if [ -z "${ARG_OUTPUT_DIR}" ]; then
 fi
 
 # -----------------------------------------------------------------------------
-# scan for files found in ARG_INPUT_DIR
+# copy files to ARG_OUTPUT_DIR
+#
+echo "Copying source files to destination..."
+
+mkdir -p "${ARG_OUTPUT_DIR}"
+cp ${ARG_INPUT_DIR}/* ${ARG_OUTPUT_DIR}
+
+echo "Copying source files to destination complete."
+
+# -----------------------------------------------------------------------------
+# transpose filenames (lowercase and legal posix name)
 #
 echo "Transposing filesnames..."
 
 # get directory names
-LC_DIRNAME=`echo ${ARG_INPUT_DIR} | sed 's/.*/\L&/g'`
+LC_DIRNAME=`echo ${ARG_OUTPUT_DIR} | sed 's/.*/\L&/g'`
 POSIX_DIRNAME=`echo ${LC_DIRNAME} | sed 's/[^A-Za-z0-9\-\._\/]/_/g'`
 
 # set filenames to lowercase
-find "${ARG_INPUT_DIR}" -depth -name "*" -exec basename "{}" \; -execdir rename 'y/A-Z/a-z/' "{}" \; &>/dev/null
+find "${ARG_OUTPUT_DIR}" -depth -name "*" -exec basename "{}" \; -execdir rename 'y/A-Z/a-z/' "{}" \; &>/dev/null
 
 # set filenames to legal posix names (A-Z; 0-9), replacing illegal chars with underscore (_)
 find "${LC_DIRNAME}" -depth -name "*" -exec basename "{}" \; -execdir rename 's/[^A-Za-z0-9\-\._\/]/_/g' "{}" \; &>/dev/null
+
+# set tmp filename extension
+find "${LC_DIRNAME}" -type f -exec mv '{}' '{}'.tmp \; &>/dev/null
 
 echo "Transposing filesnames complete."
 
@@ -142,12 +155,10 @@ echo "Transposing filesnames complete."
 #
 echo "Reducing file sizes and applying watermark..."
 
-mkdir -p "${POSIX_DIRNAME}"/"${POSIX_DIRNAME}"
-
-for file in "${POSIX_DIRNAME}"/*.jpg;
+for file in "${POSIX_DIRNAME}"/*.tmp;
 do
-   convert $file -quality 50 -auto-orient -resize x1000 ./dbi_watermark.png -gravity southeast -geometry +15+15 -composite "${POSIX_DIRNAME}"/reduced\_$(basename $file)
-   mv "${POSIX_DIRNAME}"/reduced\_$(basename $file) "${POSIX_DIRNAME}"/"${POSIX_DIRNAME}"
+   convert $file -quality 50 -auto-orient -resize x1000 ./dbi_watermark.png -gravity southeast -geometry +15+15 -composite "${POSIX_DIRNAME}"/reduced\_$(basename ${file%.*})
+   rm $file
 done
 
 echo "Reducing file sizes and applying watermark complete."
@@ -158,16 +169,16 @@ echo "Reducing file sizes and applying watermark complete."
 echo "Creating HTML output file..."
 
 # generate results file
-echo '<li data-album="'${ARG_GALLERY}'">'${ARG_GALLERY}'</li>' > "${ARG_OUTPUT_DIR}"/"${POSIX_DIRNAME}".results
-echo >> "${ARG_OUTPUT_DIR}"/"${POSIX_DIRNAME}".results
-echo '<!-- BEGIN '${ARG_GALLERY}' gallery images -->'>> "${ARG_OUTPUT_DIR}"/"${POSIX_DIRNAME}".results
-for i in $(find "${POSIX_DIRNAME}"/"${POSIX_DIRNAME}" -type f -name '*' -exec basename "{}" \;);
+echo '<li data-album="'${ARG_GALLERY}'">'${ARG_GALLERY}'</li>' > "${ARG_OUTPUT_DIR}".results
+echo >> "${ARG_OUTPUT_DIR}".results
+echo '<!-- BEGIN '${ARG_GALLERY}' gallery images -->'>> "${ARG_OUTPUT_DIR}".results
 
+for i in $(find "${POSIX_DIRNAME}" -type f -name '*' -exec basename "{}" \;);
 do
-    echo '<div class="file" data-type="image" data-source="./images/work/'${POSIX_DIRNAME}'/'${i}'" data-caption="" data-album="'${ARG_GALLERY}'"></div>' >> "${ARG_OUTPUT_DIR}"/"${POSIX_DIRNAME}".results
+    echo '<div class="file" data-type="image" data-source="./images/work/'$(basename ${POSIX_DIRNAME})'/'${i}'" data-caption="" data-album="'${ARG_GALLERY}'"></div>' >> "${ARG_OUTPUT_DIR}".results
 done
 
-echo '<!-- END '${ARG_GALLERY}' gallery images -->'>> "${ARG_OUTPUT_DIR}"/"${POSIX_DIRNAME}".results
+echo '<!-- END '${ARG_GALLERY}' gallery images -->'>> "${ARG_OUTPUT_DIR}".results
 
 echo "Creating HTML output file complete."
 

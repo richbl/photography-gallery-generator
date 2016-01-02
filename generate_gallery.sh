@@ -19,7 +19,7 @@ PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 # A bash script to prep (rename, resize, reduce, and watermark) a folder of
 # images, and then generate an index in HTML
 #
-# Version: 0.2.0
+# Version: 0.2.1
 #
 # Requirements:
 #
@@ -126,7 +126,7 @@ fi
 echo "Copying source files to destination..."
 
 mkdir -p "${ARG_OUTPUT_DIR}"
-cp ${ARG_INPUT_DIR}/* ${ARG_OUTPUT_DIR}
+cp "${ARG_INPUT_DIR}"/* "${ARG_OUTPUT_DIR}"
 
 echo "Copying source files to destination complete."
 
@@ -183,5 +183,5 @@ echo '<!-- END '${ARG_GALLERY}' gallery images -->'>> "${ARG_OUTPUT_DIR}".result
 echo "Creating HTML output file complete."
 
 echo
-echo "Success. Results file ("${POSIX_DIRNAME}".results) created in ${ARG_OUTPUT_DIR}."
+echo "Success. Results file ($(basename ${POSIX_DIRNAME}).results) created in ${ARG_OUTPUT_DIR}."
 echo

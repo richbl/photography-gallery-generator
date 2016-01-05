@@ -60,7 +60,22 @@ function quit {
   exit 1
 }
 
+function abs_script_dir_path {
+    SOURCE=$(if [ -z "${BASH_SOURCE[0]}" ]; then echo $1; else echo ${BASH_SOURCE[0]}; fi)
+    while [ -h "$SOURCE" ]; do
+      DIR=$( cd -P $( dirname "$SOURCE") && pwd )
+      SOURCE=$(readlink "$SOURCE")
+      [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE"
+    done
+    DIR=$( cd -P $( dirname "$SOURCE" ) && pwd )
+    echo $DIR
+}
+
+# -----------------------------------------------------------------------------
+# global variables
+#
 DEBUG=false
+DIR=$(abs_script_dir_path)
 
 # -----------------------------------------------------------------------------
 # check requirements
@@ -70,7 +85,7 @@ if ! type "convert" &> /dev/null; then
   quit
 fi
 
-if [ ! -f dbi_watermark.png ]; then
+if [ ! -f ${DIR}/dbi_watermark.png ]; then
    echo "Error: watermark file not found."
    quit
 fi
@@ -157,7 +172,7 @@ echo "Reducing file sizes and applying watermark..."
 
 for file in "${POSIX_DIRNAME}"/*.tmp;
 do
-   convert $file -quality 50 -auto-orient -resize x1000 ./dbi_watermark.png -gravity southeast -geometry +15+15 -composite "${POSIX_DIRNAME}"/reduced\_$(basename ${file%.*})
+   convert $file -quality 50 -auto-orient -resize x1000 ${DIR}/dbi_watermark.png -gravity southeast -geometry +15+15 -composite "${POSIX_DIRNAME}"/reduced\_$(basename ${file%.*})
    rm $file
 done
 

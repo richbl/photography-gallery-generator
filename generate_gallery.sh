@@ -19,7 +19,7 @@ PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 # A bash script to prep (rename, resize, reduce, and watermark) a folder of
 # images, and then generate an index in HTML
 #
-# Version: 0.2.1
+# Version: 0.3.0
 #
 # Requirements:
 #
@@ -183,16 +183,23 @@ echo "Reducing file sizes and applying watermark complete."
 #
 echo "Creating HTML output file..."
 
-# generate results file
-echo '<li data-album="'${ARG_GALLERY}'">'${ARG_GALLERY}'</li>' > "${ARG_OUTPUT_DIR}".results
-echo >> "${ARG_OUTPUT_DIR}".results
-echo '<!-- BEGIN '${ARG_GALLERY}' gallery images -->'>> "${ARG_OUTPUT_DIR}".results
+# generate results file (sorted)
+TMPFILE=$(mktemp);
 
 for i in $(find "${POSIX_DIRNAME}" -type f -name '*' -exec basename "{}" \;);
 do
-    echo '<div class="file" data-type="image" data-source="./images/work/'$(basename ${POSIX_DIRNAME})'/'${i}'" data-caption="" data-album="'${ARG_GALLERY}'"></div>' >> "${ARG_OUTPUT_DIR}".results
+    echo '<div class="file" data-type="image" data-source="./images/work/'$(basename ${POSIX_DIRNAME})'/'${i}'" data-caption="" data-album="'${ARG_GALLERY}'"></div>' >> ${TMPFILE}
 done
 
+# sort content
+sort ${TMPFILE} -o "${ARG_OUTPUT_DIR}".results
+
+# generate results file
+LINE="<li data-album=${ARG_GALLERY}>${ARG_GALLERY}</li>
+
+<!-- BEGIN ${ARG_GALLERY} gallery images -->"
+
+echo "${LINE}" | cat - "${ARG_OUTPUT_DIR}".results > ${TMPFILE} && mv ${TMPFILE} "${ARG_OUTPUT_DIR}".results
 echo '<!-- END '${ARG_GALLERY}' gallery images -->'>> "${ARG_OUTPUT_DIR}".results
 
 echo "Creating HTML output file complete."

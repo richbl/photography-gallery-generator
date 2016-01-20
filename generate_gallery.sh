@@ -19,7 +19,7 @@ PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 # A bash script to prep (rename, resize, reduce, and watermark) a folder of
 # images, and then generate an index in HTML
 #
-# Version: 0.3.1
+# Version: 0.3.2
 #
 # Requirements:
 #
@@ -133,6 +133,12 @@ fi
 if [ -z "${ARG_OUTPUT_DIR}" ]; then
   echo "Error: output_dir argument (-o|--output_dir) missing."
   quit
+fi
+
+# special case checks
+if [ ! -d "${ARG_INPUT_DIR}" ]; then
+   echo "Error: input_dir specified (-i|--input_dir) does not exist."
+   quit
 fi
 
 if [ "${ARG_OUTPUT_DIR}" == "." ]; then

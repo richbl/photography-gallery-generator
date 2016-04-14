@@ -18,143 +18,55 @@ PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 #
 # A bash script to prep (rename, resize, reduce, and watermark) a folder of
 # images, and then generate an index in HTML
+# version: 0.4.0
 #
-# Version: 0.3.2
-#
-# Requirements:
-#
+# requirements:
 #  --A folder full of image files
-#  --File for watermark (dbi_watermark.png)
+#  --File for watermark
 #  --Imagemagick (convert program) for file conversion (size reduction)
 #
-# Inputs:
-#
+# inputs:
 #  --Gallery name
 #  --Output directory to save exported file (absolute path)
 #
-# Outputs:
-#
+# outputs:
 #  --An exported HTML file if processed successful
 #  --If failure, causing error message displayed
 #
 
-echo "
-|
-| A bash script to prep (rename, resize, reduce, and watermark) a folder of
-| images, and then generate an index in HTML
-|
-| Usage:
-|   generate_gallery [options]
-|
-|   -g, --gallery             gallery name
-|   -i, --input_dir           absolute directory path to files for parsing
-|   -o, --output_dir          absolute directory path for resulting HTML file
-|"
-echo
-
 # -----------------------------------------------------------------------------
-# functions
+# script configuration
 #
-function quit {
-  echo
-  exit 1
-}
+shopt -s extglob
+EXEC_DIR="$(dirname "$0")"
+. ${EXEC_DIR}/lib/args
+. ${EXEC_DIR}/lib/general
 
-function abs_script_dir_path {
-    SOURCE=$(if [ -z "${BASH_SOURCE[0]}" ]; then echo $1; else echo ${BASH_SOURCE[0]}; fi)
-    while [ -h "$SOURCE" ]; do
-      DIR=$( cd -P $( dirname "$SOURCE") && pwd )
-      SOURCE=$(readlink "$SOURCE")
-      [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE"
-    done
-    DIR=$( cd -P $( dirname "$SOURCE" ) && pwd )
-    echo $DIR
-}
+ARGS_FILE="${EXEC_DIR}/data/config.json"
+
+# [user-config] set any external dependencies here
+declare -a REQ_PROGRAMS=('jq' 'convert')
+declare -a REQ_FILES='('"${EXEC_DIR}"'/dbi_watermark.png)'
 
 # -----------------------------------------------------------------------------
-# global variables
+# perform script configuration, arguments parsing, and validation
 #
-DEBUG=false
-DIR=$(abs_script_dir_path)
+check_program_dependencies "REQ_PROGRAMS[@]"
+check_file_dependencies "REQ_FILES[@]"
+display_banner
+scan_for_args "$@"
+check_for_args_completeness
 
 # -----------------------------------------------------------------------------
-# check requirements
-#
-if ! type "convert" &> /dev/null; then
-  echo "Error: convert program not installed."
-  quit
-fi
-
-if [ ! -f ${DIR}/dbi_watermark.png ]; then
-   echo "Error: watermark file not found."
-   quit
-fi
-
-# -----------------------------------------------------------------------------
-# scan cmdline for arguments
-#
-while [[ $# -gt 0 ]]
-do
-  ARG="$1"
-
-  case $ARG in
-   -g|--gallery)
-      ARG_GALLERY="$2"
-      shift # skip argument
-      ;;
-   -i|--input_dir)
-      ARG_INPUT_DIR="$2"
-      shift # skip argument
-      ;;
-   -o|--output_dir)
-      ARG_OUTPUT_DIR="$2"
-      shift # skip argument
-      ;;
-   *)
-      # unknown argument
-      ;;
-  esac
-  shift # skip argument or value
-done
-
-# -----------------------------------------------------------------------------
-# check argument completeness
-#
-if [ -z "${ARG_GALLERY}" ]; then
-  echo "Error: gallery argument (-g|--gallery) missing."
-  quit
-fi
-
-if [ -z "${ARG_INPUT_DIR}" ]; then
-  echo "Error: input_dir argument (-i|--input_dir) missing."
-  quit
-fi
-
-if [ -z "${ARG_OUTPUT_DIR}" ]; then
-  echo "Error: output_dir argument (-o|--output_dir) missing."
-  quit
-fi
-
-# special case checks
-if [ ! -d "${ARG_INPUT_DIR}" ]; then
-   echo "Error: input_dir specified (-i|--input_dir) does not exist."
-   quit
-fi
-
-if [ "${ARG_OUTPUT_DIR}" == "." ]; then
-  echo "Error: output_dir argument (-o|--output_dir) cannot be self-referential (.)."
-  quit
-fi
-
-# -----------------------------------------------------------------------------
-# copy files to ARG_OUTPUT_DIR
+# copy files to output_dir
 #
 echo "Copying source files to destination..."
 
-mkdir -p "${ARG_OUTPUT_DIR}"
-cp "${ARG_INPUT_DIR}"/* "${ARG_OUTPUT_DIR}"
+mkdir -p "$(get_config_arg_value output_dir)"
+cp "$(get_config_arg_value input_dir)"/* "$(get_config_arg_value output_dir)"
 
 echo "Copying source files to destination complete."
+echo
 
 # -----------------------------------------------------------------------------
 # transpose filenames (lowercase and legal posix name)
@@ -162,11 +74,11 @@ echo "Copying source files to destination complete."
 echo "Transposing filesnames..."
 
 # get directory names
-LC_DIRNAME=`echo ${ARG_OUTPUT_DIR} | sed 's/.*/\L&/g'`
+LC_DIRNAME=`echo $(get_config_arg_value output_dir) | sed 's/.*/\L&/g'`
 POSIX_DIRNAME=`echo ${LC_DIRNAME} | sed 's/[^A-Za-z0-9\-\._\/]/_/g'`
 
 # set filenames to lowercase
-find "${ARG_OUTPUT_DIR}" -depth -name "*" -exec basename "{}" \; -execdir rename 'y/A-Z/a-z/' "{}" \; &>/dev/null
+find "$(get_config_arg_value output_dir)" -depth -name "*" -exec basename "{}" \; -execdir rename 'y/A-Z/a-z/' "{}" \; &>/dev/null
 
 # set filenames to legal posix names (A-Z; 0-9), replacing illegal chars with underscore (_)
 find "${LC_DIRNAME}" -depth -name "*" -exec basename "{}" \; -execdir rename 's/[^A-Za-z0-9\-\._\/]/_/g' "{}" \; &>/dev/null
@@ -175,46 +87,46 @@ find "${LC_DIRNAME}" -depth -name "*" -exec basename "{}" \; -execdir rename 's/
 find "${LC_DIRNAME}" -type f -exec mv '{}' '{}'.tmp \; &>/dev/null
 
 echo "Transposing filesnames complete."
+echo
 
 # -----------------------------------------------------------------------------
 # reducing file sizes
 #
 echo "Reducing file sizes and applying watermark..."
 
-for file in "${POSIX_DIRNAME}"/*.tmp;
-do
-   convert $file -quality 50 -auto-orient -resize x1000 ${DIR}/dbi_watermark.png -gravity southeast -geometry +15+15 -composite "${POSIX_DIRNAME}"/reduced\_$(basename ${file%.*})
-   rm $file
+for file in "${POSIX_DIRNAME}"/*.tmp; do
+  convert $file -quality 50 -auto-orient -resize x1000 ${EXEC_DIR}/dbi_watermark.png -gravity southeast -geometry +15+15 -composite "${POSIX_DIRNAME}"/reduced\_$(basename ${file%.*})
+  rm $file
 done
 
 echo "Reducing file sizes and applying watermark complete."
+echo
 
 # -----------------------------------------------------------------------------
-# generate files list
+# generate files list (HTML)
 #
 echo "Creating HTML output file..."
 
 # generate results file (sorted)
 TMPFILE=$(mktemp);
 
-for i in $(find "${POSIX_DIRNAME}" -type f -name '*' -exec basename "{}" \;);
-do
-    echo '<div class="file" data-type="image" data-source="./images/work/'$(basename ${POSIX_DIRNAME})'/'${i}'" data-caption="" data-album="'${ARG_GALLERY}'"></div>' >> ${TMPFILE}
+for i in $(find "${POSIX_DIRNAME}" -type f -name '*' -exec basename "{}" \;); do
+  echo '<div class="file" data-type="image" data-source="./images/work/'$(basename ${POSIX_DIRNAME})'/'${i}'" data-caption="" data-album="'$(get_config_arg_value gallery)'"></div>' >> ${TMPFILE}
 done
 
 # sort content
-sort ${TMPFILE} -o "${ARG_OUTPUT_DIR}".results
+sort ${TMPFILE} -o "$(get_config_arg_value output_dir)".results
 
 # generate results file
-LINE="<li data-album=${ARG_GALLERY}>${ARG_GALLERY}</li>
+LINE="<li data-album=$(get_config_arg_value gallery)>$(get_config_arg_value gallery)</li>
 
-<!-- BEGIN ${ARG_GALLERY} gallery images -->"
+<!-- BEGIN $(get_config_arg_value gallery) gallery images -->"
 
-echo "${LINE}" | cat - "${ARG_OUTPUT_DIR}".results > ${TMPFILE} && mv ${TMPFILE} "${ARG_OUTPUT_DIR}".results
-echo '<!-- END '${ARG_GALLERY}' gallery images -->'>> "${ARG_OUTPUT_DIR}".results
+echo "${LINE}" | cat - "$(get_config_arg_value output_dir)".results > ${TMPFILE} && mv ${TMPFILE} "$(get_config_arg_value output_dir)".results
+echo '<!-- END '$(get_config_arg_value gallery)' gallery images -->'>> "$(get_config_arg_value output_dir)".results
 
 echo "Creating HTML output file complete."
 
 echo
-echo "Success. Results file ($(basename ${POSIX_DIRNAME}).results) created in ${ARG_OUTPUT_DIR}."
+echo "Success. Results file ($(basename ${POSIX_DIRNAME}).results) created in $(get_config_arg_value output_dir)."
 echo

@@ -44,7 +44,6 @@ EXEC_DIR="$(dirname "$0")"
 
 ARGS_FILE="${EXEC_DIR}/data/config.json"
 
-# [user-config] set any external dependencies here
 declare -a REQ_PROGRAMS=('jq' 'convert')
 declare -a REQ_FILES='('"${EXEC_DIR}"'/dbi_watermark.png)'
 

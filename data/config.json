@@ -2,7 +2,7 @@
   "details":
     {
       "title": "A bash script to prep (rename, resize, reduce, and watermark) a folder of images, and then generate an index in HTML",
-      "syntax": "generate_gallery -g gallery -i input_dir -o output_dir",
+      "syntax": "generate_gallery.sh -g gallery -i input_dir -o output_dir",
       "version": "0.4.0"
     },
   "arguments":

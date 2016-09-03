@@ -2,6 +2,21 @@
 
 This is a simple bash script that parses a folder of images (default: jpg), processes them (reduces, resizes, and applies a watermark) using ImageMagick, and generates an HTML index for use in a photography website.
 
+## [<img src="https://cloud.githubusercontent.com/assets/10182110/18208786/ae5d76b2-70e5-11e6-9663-cfe47d13f4d9.png" width="150" />](https://github.com/richbl/a-bash-template)Developed with a Bash Template (BaT)
+
+The [bash](https://en.wikipedia.org/wiki/Bash_%28Unix_shell%29) scripts in **Taiga.io-Scripts** use a bash template (BaT) called **[A-Bash-Template](https://github.com/richbl/a-bash-template)** designed to make script development and command line argument management more robust, easier to implement, and easier to maintain. Here are a few of those features:
+
+- Dependencies checker: a routine that checks all external program dependencies (*e.g.*, [sshpass](http://linux.die.net/man/1/sshpass) and [jq](https://stedolan.github.io/jq/))
+- Arguments and script details--such as script description and syntax--are stored in the [JSON](http://www.json.org/) file format (*i.e.*, `config.json`)
+- JSON queries (using [jq](https://stedolan.github.io/jq/)) handled through wrapper functions
+- A script banner function automates banner generation, reading directly from `config.json`
+- Command line arguments are parsed and tested for completeness using both short and long-format argument syntax (*e.g.*, `-u|--username`)
+- Optional command line arguments are permissible and managed through the JSON configuration file
+- Template functions organized into libraries to minimize code footprint in the main script
+
+For more details about using a bash template, [check out the BaT prooject here](https://github.com/richbl/a-bash-template).
+
+##Example
 See below for an example of both a processed image file and the resulting HTML index:
 
 ![Sample Output from generate_gallery with Watermark](https://cloud.githubusercontent.com/assets/10182110/11600178/e89555b2-9a7f-11e5-8d9a-888f57f62035.jpg "Sample Output from generate_gallery with Watermark")

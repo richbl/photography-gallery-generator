@@ -14,7 +14,7 @@ This [bash](https://en.wikipedia.org/wiki/Bash_%28Unix_shell%29) script uses a b
 - Optional command line arguments are permissible and managed through the JSON configuration file
 - Template functions organized into libraries to minimize code footprint in the main script
 
-For more details about using a bash template, [check out the BaT prooject here](https://github.com/richbl/a-bash-template).
+For more details about using a bash template, [check out the BaT project here](https://github.com/richbl/a-bash-template).
 
 ## Example
 See below for an example of both a processed image file and the resulting HTML index:

@@ -17,7 +17,6 @@ PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 # -----------------------------------------------------------------------------
 #
 # bash library for general-purpose script processing
-# version: 0.5.0
 #
 
 # -----------------------------------------------------------------------------
@@ -25,14 +24,15 @@ PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 #
 function check_program_dependencies {
 
-  local -a DEPS=("${!1}")
+  local -a DEPS=("$@")
 
   for i in "${DEPS[@]}"; do
-    if ! type $i &>/dev/null; then
-      echo
-      echo "Error: program $i not installed."
-      quit
+
+    if ! type "$i" &>/dev/null; then
+      printf "\n%s\n" "Error: program $i not installed."
+      quit 1
     fi
+
   done
 
 }
@@ -42,13 +42,15 @@ function check_program_dependencies {
 #
 function check_file_dependencies {
 
-  local -a DEPS=("${!1}")
+  local -a DEPS=("$@")
+
   for i in "${DEPS[@]}"; do
-    if [ ! -f $i &>/dev/null ]; then
-      echo
-      echo "Error: file $i not found."
-      quit
+
+    if [ ! -f "$i" ]; then
+      printf "\n%s\n" "Error: file $i not found."
+      quit 1
     fi
+
   done
 
 }
@@ -58,22 +60,32 @@ function check_file_dependencies {
 #
 function display_banner {
 
-  echo
-  echo " |"
-  echo " |" $(get_config_details title)
-  echo " |  " $(get_config_details version)
-  echo " |"
-  echo " | Usage:"
-  echo " |  " $(get_config_details syntax)
-  echo " |"
+  printf "\n"
+  printf "%s\n" " |"
+  printf "%s\n" " |  $(get_config_details title)"
+  printf "%s\n" " |    $(get_config_details version)"
+  printf "%s\n" " |"
+  printf "%s\n" " |  Usage:"
+  printf "%s\n" " |    $(get_config_details syntax)"
+  printf "%s\n" " |"
 
-  local COUNT_ARGS=$(get_config_args_length)
+  local MAX_COL=0
+  local COUNT_ARGS=0
+  COUNT_ARGS=$(get_config_args_length)
+
+  # determine maximum column width for setting output columns
+  #
   for ((j=0;j<COUNT_ARGS;j++)) do
-    echo -e ' |  ' $(get_config_arg $j short_form)',' $(get_config_arg $j long_form)' \t'$(get_config_arg $j description)
+    ARG_LEN=$(get_config_arg $j short_form)+$(get_config_arg $j long_form)
+    ((${#ARG_LEN} > MAX_COL)) && MAX_COL=${#ARG_LEN}
+    ((j == COUNT_ARGS-1 )) && ((MAX_COL+=6))
   done
 
-  echo " |"
-  echo
+  for ((j=0;j<COUNT_ARGS;j++)) do
+    printf "%-${MAX_COL}s %s\n" " |  $(get_config_arg $j short_form), $(get_config_arg $j long_form)" "$(get_config_arg $j description)"
+  done
+
+  printf "%s\n\n" " |"
 
 }
 
@@ -82,7 +94,10 @@ function display_banner {
 #
 function quit {
 
-  echo
-  exit 1
+  local RES=""
+  RES=("${1}")
+
+  printf "\n"
+  exit "${RES[]}"
 
 }

@@ -1,6 +1,9 @@
 ## Photography Gallery Generator
+This is a simple [BaT](https://github.com/richbl/a-bash-template) bash script that:
 
-This is a simple bash script that parses a folder of images (default: jpg), processes them (reduces, resizes, and applies a watermark) using ImageMagick, and generates an HTML index for use in a photography website.
+- Parses a folder of images (default: jpg)
+- Processes these image files (reduces, resizes, and applies a watermark) using ImageMagick
+- Generates an HTML index for use in a photography website
 
 ## [<img src="https://cloud.githubusercontent.com/assets/10182110/18208786/ae5d76b2-70e5-11e6-9663-cfe47d13f4d9.png" width="150" />](https://github.com/richbl/a-bash-template)Developed with a Bash Template (BaT)
 

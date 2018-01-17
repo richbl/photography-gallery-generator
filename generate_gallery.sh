@@ -38,10 +38,10 @@ PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 #
 shopt -s extglob
 EXEC_DIR="$(dirname "$0")"
-# shellcheck source=lib/args
-source "${EXEC_DIR}/lib/args"
-# shellcheck source=lib/general
-source "${EXEC_DIR}/lib/general"
+# shellcheck source=bash-lib/args
+source "${EXEC_DIR}/bash-lib/args"
+# shellcheck source=bash-lib/general
+source "${EXEC_DIR}/bash-lib/general"
 
 declare -a REQ_PROGRAMS=('jq' 'convert')
 declare -a REQ_FILES='('"${EXEC_DIR}"'/dbi_watermark.png)'

@@ -22,7 +22,7 @@ For more details about using a bash template, [check out the BaT project here](h
 ## Example
 See below for an example of both a processed image file and the resulting HTML index:
 
-<picture>![Sample Output from generate_gallery with Watermark](https://cloud.githubusercontent.com/assets/10182110/11600178/e89555b2-9a7f-11e5-8d9a-888f57f62035.jpg "Sample Output from generate_gallery with Watermark")</picture>
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://cloud.githubusercontent.com/assets/10182110/11600178/e89555b2-9a7f-11e5-8d9a-888f57f62035.jpg"><source media="(prefers-color-scheme: light)" srcset="https://cloud.githubusercontent.com/assets/10182110/11600178/e89555b2-9a7f-11e5-8d9a-888f57f62035.jpg"><img src="https://cloud.githubusercontent.com/assets/10182110/11600178/e89555b2-9a7f-11e5-8d9a-888f57f62035.jpg"></picture>
 
 
 ```
@@ -48,8 +48,8 @@ See below for an example of both a processed image file and the resulting HTML i
 <div class="file" data-type="image" data-source="./images/work/macro_world/reduced_imgp5595.jpg" data-caption="" data-album="Macro World"></div>
 <!-- END Macro World gallery images -->
 ```
-## IMPORTANT: This Project Uses Git Submodules  <picture><img src="https://user-images.githubusercontent.com/10182110/208980142-08d4cf6e-20ac-4243-ac69-e056258b0315.png" width="150" /></picture>
+## IMPORTANT: This Project Uses Git Submodules <picture><source media="(prefers-color-scheme: dark)" srcset="https://user-images.githubusercontent.com/10182110/208980142-08d4cf6e-20ac-4243-ac69-e056258b0315.png" width="150"><source media="(prefers-color-scheme: light)" srcset="https://user-images.githubusercontent.com/10182110/208980142-08d4cf6e-20ac-4243-ac69-e056258b0315.png" width="150"><img src="https://user-images.githubusercontent.com/10182110/208980142-08d4cf6e-20ac-4243-ac69-e056258b0315.png" width="150"></picture>
 
-This project uses a Git [submodule](https://git-scm.com/book/en/v2/Git-Tools-Submodules) project, specifically the `bash-lib` folder to keep this project up-to-date without manual intervention.
+This project uses [Git submodule project(s)](https://git-scm.com/book/en/v2/Git-Tools-Submodules) (located in the `bash-lib` folder) to keep this project up-to-date without manual intervention.
 
-So, be sure to clone this project with the `--recursive` switch (`git clone --recursive https://github.com/richbl/this_project`) so any submodule project(s) will be automatically cloned as well. If you clone into this project without this switch, you'll likely see empty submodule project folders (depending on your version of Git).
+**Be sure to clone this project with the `--recursive` switch** (`git clone --recursive https://github.com/richbl/this_project`) so any submodule project(s) will be automatically cloned as well. If you clone into this project without this switch, you'll likely see empty submodule project folders (depending on your version of Git).

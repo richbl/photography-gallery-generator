@@ -5,7 +5,7 @@ This is a simple [BaT](https://github.com/richbl/a-bash-template) bash script th
 - Processes these image files (reduces, resizes, and applies a watermark) using ImageMagick
 - Generates an HTML index for use in a photography website
 
-## [Developed with a Bash Template (BaT)](https://github.com/richbl/a-bash-template)[<img src="https://user-images.githubusercontent.com/10182110/145758715-b127adfc-710b-49d3-9ede-151adc83ae76.png" width="150" />](https://github.com/richbl/a-bash-template)
+## [<img src="https://github.com/user-attachments/assets/4dc1e16e-3fd3-481c-9a43-b027c029dd27" width="150" />](https://github.com/richbl/a-bash-template)[Developed with a Bash Template (BaT)](https://github.com/richbl/a-bash-template)
 
 This [bash](https://en.wikipedia.org/wiki/Bash_%28Unix_shell%29) script uses a bash template (BaT) called **[A-Bash-Template](https://github.com/richbl/a-bash-template)** designed to make script development and command line argument management more robust, easier to implement, and easier to maintain. Here are a few of those features:
 
